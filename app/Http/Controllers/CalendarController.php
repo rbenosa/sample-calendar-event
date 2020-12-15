@@ -85,8 +85,6 @@ class CalendarController extends Controller
         $ins_arr        = [];
 
         foreach ($days_arr as $value) {
-            
-            // $_event_title = (null != $value['event']) ? $event_title : null;
 
             if (null != $value['event']) {
                 
