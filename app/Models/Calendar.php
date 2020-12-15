@@ -9,6 +9,8 @@ class Calendar extends Model
 {
     use HasFactory;
 
+    protected $table = 'calendar'; 
+
     /**
      * The attributes that are mass assignable.
      *

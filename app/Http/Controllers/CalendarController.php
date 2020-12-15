@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Calendar;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
@@ -59,9 +60,10 @@ class CalendarController extends Controller
 
             ],
             [
-                'even_title.regex'  => 'Plese input letters and numbers',
+                'event_title.regex'  => 'Plese input letters and numbers',
                 'day.min'           => 'Please select atleast 2 days',
             ]);
+
 
             $event_title    = $request->event_title;
             $from           = $request->from;
@@ -72,7 +74,7 @@ class CalendarController extends Controller
 
 
             $now            = new Carbon($from);
-            // dd($now);
+            
             $carbon_dates   = $this->CarbonDates($now, $event_title, $days, $start, $end);
             
             $current_month  = $carbon_dates['current_month'];
@@ -80,6 +82,23 @@ class CalendarController extends Controller
             $last_day_month = $carbon_dates['last_day_month'];
     
             $days_arr       = $carbon_dates['days_arr'];
+            $ins_arr        = [];
+
+            foreach ($days_arr as $value) {
+                
+                // $_event_title = (null != $value['event']) ? $event_title : null;
+
+                if (null != $value['event']) {
+                    
+                    array_push($ins_arr, [
+                        'event_title'   => $event_title,
+                        'date'          => $value['date'],  
+                    ]);
+                }
+            }
+            
+
+            Calendar::insert($ins_arr);
 
           
             $view = view('calendar.render-table', compact(['current_month', 'current_year', 'last_day_month', 'days_arr']))->render();
@@ -87,6 +106,7 @@ class CalendarController extends Controller
         
             
     }
+
 
     public function CarbonDates($now, $event_title, $days, $start, $end)
     {
@@ -102,20 +122,16 @@ class CalendarController extends Controller
             $day        = $dt->format('D');
             $dt_format  = $i . ' ' . $day;
             
-            $disp_event = (in_array($day, $days) && ($start <= $i) && ($end >= $i))  ? $event_title : null;
-            // dd($days);
-            // if(in_array($day, $days)){
-            //     $disp_event = $event_title;
-            // } else {
-            //     $disp_event = null;
-            // }
 
+            $disp_event = (in_array($day, $days) && ($start <= $i) && ($end >= $i))  ? $event_title : null;
+            
             array_push($days_arr, [
-                'dt' => $dt_format,
+                'dt'    => $dt_format,
+                'date'  => $dt->toDateString(),
                 'event' => $disp_event,
-                ]);
+            ]);
+
         }
-        // dd($days_arr);
 
         return [
             'current_month'     => $current_month,
