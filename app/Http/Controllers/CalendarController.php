@@ -28,86 +28,90 @@ class CalendarController extends Controller
 
 
     /* 
-    * Store to DB
+    * Storing to DB
     */
     public function store(Request $request)
     {
-            $this->validate($request, [
+        $this->validate($request, [
 
-                'event_title'   => [
-                                    'nullable',
-                                    'regex:/^[a-zA-Z0-9 .\-]+$/i'
-                                ],
+            'event_title'   => [
+                                'nullable',
+                                'regex:/^[a-zA-Z0-9 .\-]+$/i'
+                            ],
 
-                'from'          => [
-                                    'required',
-                                    'date',
-                                    'date_format:Y-m-d',
-                                ],
+            'from'          => [
+                                'required',
+                                'date',
+                                'date_format:Y-m-d',
+                            ],
 
-                'to'            => [
-                                    'required',
-                                    'date',
-                                    'date_format:Y-m-d',
-                                    'after:from'
-                                ],
+            'to'            => [
+                                'required',
+                                'date',
+                                'date_format:Y-m-d',
+                                'after:from'
+                            ],
 
-                'day'           => [
+            'day'           => [
 
-                                    'required',
-                                    'min:2'
-                                ]
+                                'required',
+                                'min:2'
+                            ]
 
-            ],
-            [
-                'event_title.regex'  => 'Plese input letters and numbers',
-                'day.min'           => 'Please select atleast 2 days',
-            ]);
-
-
-            $event_title    = $request->event_title;
-            $from           = $request->from;
-            $to             = $request->to;
-            $days           = $request->day;
-            $start          = date('d', strtotime($from));
-            $end            = date('d', strtotime($to));
+        ],
+        [
+            'event_title.regex'  => 'Plese input letters and numbers',
+            'day.min'           => 'Please select atleast 2 days',
+        ]);
 
 
-            $now            = new Carbon($from);
-            
-            $carbon_dates   = $this->CarbonDates($now, $event_title, $days, $start, $end);
-            
-            $current_month  = $carbon_dates['current_month'];
-            $current_year   = $carbon_dates['current_year'];
-            $last_day_month = $carbon_dates['last_day_month'];
-    
-            $days_arr       = $carbon_dates['days_arr'];
-            $ins_arr        = [];
+        $event_title    = $request->event_title;
+        $from           = $request->from;
+        $to             = $request->to;
+        $days           = $request->day;
+        $start          = date('d', strtotime($from));
+        $end            = date('d', strtotime($to));
 
-            foreach ($days_arr as $value) {
-                
-                // $_event_title = (null != $value['event']) ? $event_title : null;
 
-                if (null != $value['event']) {
-                    
-                    array_push($ins_arr, [
-                        'event_title'   => $event_title,
-                        'date'          => $value['date'],  
-                    ]);
-                }
-            }
-            
-
-            Calendar::insert($ins_arr);
-
-          
-            $view = view('calendar.render-table', compact(['current_month', 'current_year', 'last_day_month', 'days_arr']))->render();
-            return Response::json($view);
+        $now            = new Carbon($from);
         
+        $carbon_dates   = $this->CarbonDates($now, $event_title, $days, $start, $end);
+        
+        $current_month  = $carbon_dates['current_month'];
+        $current_year   = $carbon_dates['current_year'];
+        $last_day_month = $carbon_dates['last_day_month'];
+
+        $days_arr       = $carbon_dates['days_arr'];
+        $ins_arr        = [];
+
+        foreach ($days_arr as $value) {
+            
+            // $_event_title = (null != $value['event']) ? $event_title : null;
+
+            if (null != $value['event']) {
+                
+                array_push($ins_arr, [
+                    'event_title'   => $event_title,
+                    'date'          => $value['date'],  
+                ]);
+            }
+        }
+        
+
+        Calendar::insert($ins_arr);
+
+        
+        $view = view('calendar.render-table', compact(['current_month', 'current_year', 'last_day_month', 'days_arr']))->render();
+
+        return Response::json($view);
             
     }
 
 
+    /* 
+    * A function for determining the day of a date
+    * and to match the event title to a date
+    */
     public function CarbonDates($now, $event_title, $days, $start, $end)
     {
         $current_month  = $now->format('M');

@@ -20,6 +20,7 @@
             <td>{{ $items['dt'] }}</td>
             <td>{{ $items['event'] }}</td>
         </tr>
+        
         @endforeach
     </tbody>
 </table>
