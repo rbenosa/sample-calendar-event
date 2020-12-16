@@ -55,7 +55,7 @@ class CalendarController extends Controller
             'day'           => [
 
                                 'required',
-                                'min:2'
+                                'min:1'
                             ]
 
         ],
