@@ -35,6 +35,7 @@ class CalendarController extends Controller
         $this->validate($request, [
 
             'event_title'   => [
+                                'required',
                                 'nullable',
                                 'regex:/^[a-zA-Z0-9 .\-]+$/i'
                             ],

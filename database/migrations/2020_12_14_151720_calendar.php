@@ -17,6 +17,7 @@ class Calendar extends Migration
         Schema::create('calendar', function (Blueprint $table) {
             $table->id();
             $table->string('event_title')->nullable();
+            // $table->string('event');
             $table->date('date');
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
         });
